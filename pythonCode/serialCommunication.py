@@ -10,7 +10,7 @@ class SerialCommunication:
             self.portsList.append(str(port))#add port name to portsList
             print(str(port))
         #com=input("Select COM port (input a number)")
-        com=str(6)
+        com=str(3)
         self.serialInst.port="COM"+com
         self.serialInst.baudrate=baudrate
         self.serialInst.timeout=0#non blocking mode,returns 0's if not enough data #https://pyserial.readthedocs.io/en/latest/pyserial_api.html

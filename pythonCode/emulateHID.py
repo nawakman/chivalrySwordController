@@ -292,7 +292,7 @@ def SpecialAttackFalse():#A TESTER
 
 while True:
     for line in s1.ReceiveAll():
-        values=line.split('\t')
+        values=line.split(';')
         match values[0]:
             case "ypr1":
                 ypr()

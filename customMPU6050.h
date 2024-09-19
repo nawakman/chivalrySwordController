@@ -321,6 +321,22 @@ class CustomMPU6050{
             Serial.println(aaReal.z);*/
     }
   }
+  void GetAccelAndYawPitchRoll(float _accel[],float _ypr[]){//get both in a single call uses the same fifo packet and enhances speed
+    if (mpu.dmpGetCurrentFIFOPacket(fifoBuffer)) { // Get the Latest packet 
+            // display real acceleration, adjusted to remove gravity
+            mpu.dmpGetQuaternion(&q, fifoBuffer);
+            mpu.dmpGetAccel(&aa, fifoBuffer);
+            mpu.dmpGetGravity(&gravity, &q);
+            mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
+            _accel[0]=aaReal.x;
+            _accel[1]=aaReal.y;
+            _accel[2]=aaReal.z;
+            mpu.dmpGetYawPitchRoll(ypr,&q,&gravity);
+            _ypr[0]=ypr[0]* 180/M_PI;
+            _ypr[1]=ypr[1]* 180/M_PI;
+            _ypr[2]=ypr[2]* 180/M_PI;
+    }
+  }
 
     /*void GetWorldAccel(){//REMOVED because of"'MPU6050 {aka class MPU6050_6Axis_MotionApps20}' has no member named 'dmpGetLinearAccelInWorld'; did you mean 'dmpSendLinearAccelInWorld'?"
     if (mpu.dmpGetCurrentFIFOPacket(fifoBuffer)) { // Get the Latest packet

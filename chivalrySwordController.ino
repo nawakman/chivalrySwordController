@@ -32,64 +32,34 @@ void setup() {
   radio.Setup();
   mpu1.Setup();
   mpu2.Setup();
-  ads1.Setup();
+  /*ads1.Setup();
   //ads2.Setup();
-  nchk.Setup();
+  nchk.Setup();*/
 }
 
 void loop() {
-  
-  /*
-  Serial.print("joy\t");
-  Serial.print(j.GetX());
-  Serial.print("\t");
-  Serial.print(j.GetY());
-  Serial.print("\t");
-  Serial.println(j.ButtonDown());
-  */
-  
-  float acc1[3];
-  mpu1.GetRealAccel(acc1);
-  radio.SendNValues("acc1",3,acc1);
-  PrintNVal("acc1", 3, acc1);
 
+  float acc1[3];
   float ypr1[3];
-  mpu1.GetYawPitchRoll(ypr1);
-  radio.SendNValues("ypr1",3,ypr1);
-  PrintNVal("ypr1", 3, ypr1);
+  mpu1.GetAccelAndYawPitchRoll(acc1,ypr1);
+  radio.AddNValuesToBuffer("acc1",3,acc1);
+  radio.AddNValuesToBuffer("ypr1",3,ypr1);
+  //PrintNVal("acc1", 3, acc1);
+  //PrintNVal("ypr1", 3, ypr1);
+
   
   float ypr2[3];
   mpu2.GetYawPitchRoll(ypr2);
-  radio.SendNValues("ypr2",3,ypr2);
-  PrintNVal("ypr2", 3, ypr2);
-  
-  
-
- /* 
-  uint16_t ads1Values[4];
-  ads1.ReadAllValues(ads1Values);
-  PrintNVal("ads1",4,ads1Values);
-  */
-
-  /*
-  uint16_t ads2Values[4];
-  ads2.ReadAllValues(ads2Values);
-  //PrintNVal("ads2",4,ads2Values);
-  Serial.print("joy\t");
-  Serial.print(atj.ToJoyValue(ads2Values[0]));
-  Serial.print("\t");
-  Serial.print(atj.ToJoyValue(ads2Values[1]));
-  Serial.print("\t");
-  Serial.println(atj.ButtonDown(ads2Values[2]));
-  */
+  radio.AddNValuesToBuffer("ypr2",3,ypr2);
+  //PrintNVal("ypr2", 3, ypr2);
 
   float nchkState[9];
   if(nchk.GetNunchuckState(nchkState)){
-    radio.SendNValues("nchk1",3,nchkState);
-    radio.SendNValues("nchk2",3,6,nchkState);
-    radio.SendNValues("nchk3",6,9,nchkState);
-    PrintNVal("nchk",9,nchkState);
+    radio.AddNValuesToBuffer("nchk",9,nchkState);
+    //PrintNVal("nchk",9,nchkState);
   }
+  
+  radio.SendBuffer();
 
   while((millis()-lastUpdate)<8){//125Hz polling rate, same as xbox controller
 
