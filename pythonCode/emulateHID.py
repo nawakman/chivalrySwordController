@@ -308,8 +308,12 @@ while True:
                 acc2()
             case "btn":
                 btn()
+            case "\r":#do not print line skip in terminal
+                pass
             case _:
-                print(line)#everything else
+                """includeNonPrintable = [char for char in line]#display for exemple '\r','\n','\t' and all other non displayed character that might cause malfunction
+                print(includeNonPrintable)#everything else"""
+                print(line)
 
     while((time()-lastUpdate)<0.008):#125Hz polling rate, the same as a xBox controller
         pass

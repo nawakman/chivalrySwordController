@@ -53,11 +53,10 @@ class CustomNRF24L01{
     strcat(buffer,"\x4");//0x4 is "end of transmission" ASCII character //this one'' //"" are important, not''
     Serial.print("buffer:\n");
     Serial.println(buffer);
-    int nbLoops=strlen(buffer)/(sizeof(message)-1)+(strlen(buffer)%(sizeof(message)-1)!=0);//calculate the number of loops needed to send the whole message //-1 leave storage for terminating '\0'
+    int readableMessageSize=sizeof(message)-1;//we need to let place for the terminating '\0' //you can remove n chars by substracting n(and use bytes after '\0' to add non cstring metadata)
+    int nbLoops=(strlen(buffer)/readableMessageSize)+(strlen(buffer)%readableMessageSize!=0);//calculate the number of loops needed to send the whole message
     for(int i=0;i<nbLoops;i++){
-      strncpy(message, buffer+i*sizeof(message), sizeof(message)-1);//buffer is a pointer, by adding an offset of 32bits we skip and get the next 32 characters of the array
-      message[31]='\0';//needs to be set only once since strncopy will never access index 31, but stays here for clarity
-      //Serial.println(message);
+      strncpy(message, buffer+i*readableMessageSize, readableMessageSize);//buffer is a pointer,e.g. by adding an offset of 32 bits we skip and get the next 32 characters of the array
       radio.write(&message,sizeof(message));//32 bytes is the max NRF24L01 max message size
     }
     ClearBuffer();
@@ -65,13 +64,5 @@ class CustomNRF24L01{
 
   void ClearBuffer(){
     strcpy(buffer, "");//clears buffer
-  }
-
-  void ReceiveMessage(){
-    if(radio.available()){
-    char buffer[32]="";
-    radio.read(&buffer,sizeof(buffer));
-    Serial.println(buffer);
-    }
   }
 };
