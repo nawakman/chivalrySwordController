@@ -1,10 +1,11 @@
 #include "HardwareSerial.h"
 #include "src/Nunchuk/Nunchuk.h"//from https://github.com/infusion/Fritzing/tree/master/Nunchuk //because wiiChuck library is tto large
 
+//#define DEBUG//comment this line in customNRF24L01.h, customMPU6050.h and customNunchuk.h too to disable Serial printing 
+
 class CustomNunchuk{
   private:
     
-
   public:
     Setup(){
       nunchuk_init();
@@ -23,7 +24,9 @@ class CustomNunchuk{
         array[8]=nunchuk_buttonC();
         return true;
       }else{
+        #ifdef DEBUG
         Serial.println("cannot read nunchuck, is it plugged ?");
+        #endif
         return false;
       }
     }

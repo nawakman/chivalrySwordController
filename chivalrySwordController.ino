@@ -11,13 +11,7 @@
 Please make sure these libraries are installed for the project to work
 */
 
-//USED FOR TESTING NOT IN THE FINAL CODE
-/*#include "joystick.h"
-#include "ads1115ToJoystick.h"
-#include "movingAverage.h"
-Joystick j(1,0,3);//do not use digital pin2, it is already used as mpu6050 interrupt pin
-ADS1115ToJoystick atj;
-MovingAverage ma;//change num Readings in the class file*/
+//#define DEBUG//comment this line in customNRF24L01.h, customMPU6050.h and customNunchuk.h too to disable Serial printing 
 
 CustomNRF24L01 radio(7,8,false);
 CustomMPU6050 mpu1(0x68);//sword mpu
@@ -28,7 +22,9 @@ CustomNunchuk nchk;
 long int lastUpdate=0;
 
 void setup() {
+  #ifdef DEBUG
   Serial.begin(115200);
+  #endif
   radio.Setup();
   mpu1.Setup();
   mpu2.Setup();

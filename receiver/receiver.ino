@@ -1,15 +1,18 @@
 //https://www.youtube.com/watch?v=7rcVeFFHcFM
-
 #include <RF24.h>
 #include <nRF24L01.h>
 
-//long int lastUpdate;
+//#define DEBUG//comment this line to remove Hz counter
 
 RF24 radio(7,8);//CNS,CE
 const byte adress[6]="00001";
 //const byte adress[6]={'0','0','0','0','1','0'}; //also works
 char message[32];
 char buffer[512];//multiple of 32, must be the same as the one in emitter code
+
+#ifdef DEBUG
+long int lastUpdate;
+#endif
 
 void setup(){
   //lastUpdate = millis();
@@ -26,13 +29,18 @@ void loop(){
 
     char* eotPointer=strchr(message, '\x4');//'' are important, not"" //if EOT char found in this message, remove it //https://cplusplus.com/reference/cstring/strchr/
     if(eotPointer!=NULL){
-      *eotPointer='\0';//replace final eot with terminating '\0'
+      *(eotPointer)='\0';//replace final eot with terminating '\0'
     }
     strcat(buffer,message);//a string is received in chunks //we put the chunks together
 
     if(eotPointer!=NULL){//if EOT char found in this message we can stop receiving and start processing gathered info
       Serial.println(buffer);//buffer without previously removed EOT character
       strcpy(buffer,"");//clears buffer
+      #ifdef DEBUG
+      Serial.print("messages_per_second: ");
+      Serial.println(1000/(millis()-lastUpdate));//calculate Hz (floored)
+      lastUpdate=millis();
+      #endif
     }
   }
   //no delay, we process received data as soon as we receive it

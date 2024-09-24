@@ -292,28 +292,29 @@ def SpecialAttackFalse():#A TESTER
 
 while True:
     for line in s1.ReceiveAll():
-        values=line.split(';')
-        match values[0]:
-            case "ypr1":
-                ypr()
-            case "ypr2":
-                ypr2()
-            case "joy":
-                joy()
-            case "nchk":
-                nchk()
-            case "acc1":
-                acc()
-            case "acc2":
-                acc2()
-            case "btn":
-                btn()
-            case "\r":#do not print line skip in terminal
-                pass
-            case _:
-                """includeNonPrintable = [char for char in line]#display for exemple '\r','\n','\t' and all other non displayed character that might cause malfunction
-                print(includeNonPrintable)#everything else"""
-                print(line)
+        for chunk in line.split('\t'):
+            values=chunk.split(' ')
+            match values[0]:
+                case "ypr1":
+                    ypr()
+                case "ypr2":
+                    ypr2()
+                case "joy":
+                    joy()
+                case "nchk":
+                    nchk()
+                case "acc1":
+                    acc()
+                case "acc2":
+                    acc2()
+                case "btn":
+                    btn()
+                case "\r":#do not print line skip in terminal
+                    pass
+                case _:
+                    """includeNonPrintable = [char for char in line]#display for exemple '\r','\n','\t' and all other non displayed character that might cause malfunction
+                    print(includeNonPrintable)#everything else"""
+                    print(line)
 
     while((time()-lastUpdate)<0.008):#125Hz polling rate, the same as a xBox controller
         pass

@@ -7,6 +7,8 @@
 #include <RF24.h>
 #include <nRF24L01.h>
 
+//#define DEBUG//comment this line in customNRF24L01.h, customMPU6050.h and customNunchuk.h too to disable Serial printing 
+
 class CustomNRF24L01{
   private:
     RF24 radio;//CNS,CE
@@ -39,20 +41,22 @@ class CustomNRF24L01{
   void AddNValuesToBuffer(char prefix[],int n,float array[]){
     strcat(buffer,prefix);
     for(int i=0;i<n;i++){
-      strcat(buffer,";");
+      strcat(buffer," ");//space character between values allows you to plot them
       char temp[32];//overkill//let's arbitrarily say the float, at worst case, will fit in 32 characters (-9999999999999999999999999999.99)//if smaller, the produced cstring will be finished by \0 so not all 32 bits are used
       int nbDecimal=2;
       dtostrf(array[i], 0, (array[i]-(int)array[i])==0?0:nbDecimal, temp);//https://www.programmingelectronics.com/dtostrf/ //send an int instead of float if the float decimals are only 0's
       //Serial.print("float:");Serial.print(array[i],2);Serial.print("\tstr:");Serial.println(temp);//debug float display
       strcat(buffer,temp);
     }
-    strcat(buffer,"\n");
+    strcat(buffer,"\t");
   }
 
   void SendBuffer(){//splits buffer in packet then send them
     strcat(buffer,"\x4");//0x4 is "end of transmission" ASCII character //this one'' //"" are important, not''
+    #ifdef DEBUG
     Serial.print("buffer:\n");
     Serial.println(buffer);
+    #endif
     int readableMessageSize=sizeof(message)-1;//we need to let place for the terminating '\0' //you can remove n chars by substracting n(and use bytes after '\0' to add non cstring metadata)
     int nbLoops=(strlen(buffer)/readableMessageSize)+(strlen(buffer)%readableMessageSize!=0);//calculate the number of loops needed to send the whole message
     for(int i=0;i<nbLoops;i++){
