@@ -28,9 +28,11 @@ void setup() {
   radio.Setup();
   mpu1.Setup();
   mpu2.Setup();
-  /*ads1.Setup();
+  nchk.Setup();
+  /*
+  ads1.Setup();
   //ads2.Setup();
-  nchk.Setup();*/
+  */
 }
 
 void loop() {
