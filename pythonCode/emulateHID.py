@@ -16,8 +16,8 @@ swordYaw,swordPitch,swordRoll=0,0,0
 swordAccX,swordAccY,swordAccZ=0,0,0
 
 headYaw,headPitch,headRoll=0,0,0
-lastHeadYaw,lastHeadPitch=0,0
-absoluteHeadYaw=0
+lastHeadYaw,lastHeadPitch,lastHeadRoll=0,0,0
+absoluteHeadYaw=0#only on yaw because it is the only axis to drift
 headAccX,headAccY,headAccZ=0,0,0
 
 joyX,joyY=0,0#since we use either a joystick or a nunchuk we write to only one variable
@@ -55,8 +55,8 @@ def ypr():
         print("guard")
         #print(abs(swordYaw),"/",abs(swordPitch),"/",abs(swordRoll))
 
-def ypr2():
-    global headYaw,headPitch,roll
+def ypr2Yaw():#control X using yaw #SUBJECT TO DRIFT
+    global headYaw,headPitch,headRoll
 
     global absoluteHeadYaw,lastHeadYaw,lastHeadPitch
 
@@ -70,16 +70,35 @@ def ypr2():
         yawDiffSign=-1 if yawDiff>0 else 1
         yawDiff=yawDiffSign*abs(abs(headYaw)-abs(lastHeadYaw))#fix the difference affected by the abrupt 360 degrees change
 
-    Xcoord=yawDiff*15#standard control
+    Xcoord=yawDiff*10#standard control #you can change sensitivity here by adjusting the constant
     absoluteHeadYaw+=yawDiff#tracks absolute yaw at all time #subject to drift
 
     ###FNAF TYPE CONTROLS###
     #comment out to disable
-    #yawSign=-1 if absoluteHeadYaw>0 else 1
     Xcoord=absoluteHeadYaw*3#FNAF controls #move independently from head movement
     ########################
     
     Ycoord=(-headRoll/45)*540+(1080/2)#(lastHeadPitch-headPitch)*10
+    MouseMoveMix(Xcoord,Ycoord,False,True)
+
+def ypr2Pitch():#control X using pitch
+    global headYaw,headPitch,headRoll
+
+    global lastHeadPitch
+
+    lastHeadPitch,lastHeadRoll=headPitch,headRoll
+    headYaw,headPitch,headRoll=float(values[1]),float(values[2]),float(values[3])
+
+    pitchDiff=headPitch-lastHeadPitch
+
+    Xcoord=pitchDiff*10#standard control #you can change sensitivity here by adjusting the constant
+    
+    ###FNAF TYPE CONTROLS###
+    #comment out to disable
+    Xcoord=-headPitch*2#FNAF controls #move independently from head movement
+    ########################
+    
+    Ycoord=(-headRoll/45)*540+(1080/2)
     MouseMoveMix(Xcoord,Ycoord,False,True)
 
 def GuardFalse():
@@ -292,30 +311,33 @@ def SpecialAttackFalse():#A TESTER
 
 while True:
     for line in s1.ReceiveAll():
-        for chunk in line.split('\t'):
-            values=chunk.split(' ')
-            match values[0]:
-                case "ypr1":
-                    ypr()
-                case "ypr2":
-                    ypr2()
-                case "joy":
-                    joy()
-                case "nchk":
-                    nchk()
-                case "acc1":
-                    acc()
-                case "acc2":
-                    acc2()
-                case "btn":
-                    btn()
-                case "\r":#do not print line skip in terminal
-                    pass
-                case _:
-                    """includeNonPrintable = [char for char in line]#display for exemple '\r','\n','\t' and all other non displayed character that might cause malfunction
-                    print(includeNonPrintable)#everything else"""
-                    print(line)
+        try:
+            for chunk in line.split('\t'):
+                values=chunk.split(' ')
+                match values[0]:
+                    case "ypr1":
+                        ypr()
+                    case "ypr2":
+                        ypr2Pitch()
+                    case "joy":
+                        joy()
+                    case "nchk":
+                        nchk()
+                    case "acc1":
+                        acc()
+                    case "acc2":
+                        acc2()
+                    case "btn":
+                        btn()
+                    case "\r":#do not print line skip in terminal
+                        pass
+                    case _:
+                        """includeNonPrintable = [char for char in line]#display for exemple '\r','\n','\t' and all other non displayed character that might cause malfunction
+                        print(includeNonPrintable)#everything else"""
+                        print("does not match any command: ",line)
+        except:
+            print("bad line: ",line)
 
-    while((time()-lastUpdate)<0.008):#125Hz polling rate, the same as a xBox controller
+    while((time()-lastUpdate)<0.008):#0.008 for 125Hz polling rate, the same as a xBox controller
         pass
     lastUpdate=time()

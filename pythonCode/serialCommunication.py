@@ -47,5 +47,5 @@ class SerialCommunication:
                     yield line.decode('utf-8')
                 except:
                     print("cannot decode utf-8 package, can happen if communication has just started")
-                    print(line)
+                    print("cannot decode line: ",line)
                     return None
